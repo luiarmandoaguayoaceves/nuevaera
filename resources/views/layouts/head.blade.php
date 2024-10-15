@@ -1,4 +1,4 @@
-
+@section('head')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -16,3 +16,7 @@
     <!-- App favicon -->
     {{-- <link rel="shortcut icon" href="{{ asset('assets/img/.png') }}"> --}}
 
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css"/>
+	
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans:200,400&display=swap" rel="stylesheet">
+@endsection

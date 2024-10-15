@@ -8,7 +8,7 @@ class NavegacionController extends Controller
 {
     //
     public function index(){
-        return view('layouts/app');
+        return view('principal');
     }
 
     public function nosotros(){

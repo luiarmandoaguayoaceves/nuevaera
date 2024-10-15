@@ -1,3 +1,4 @@
-<div>
-    <!-- Walk as if you are kissing the Earth with your feet. - Thich Nhat Hanh -->
-</div>
+@extends('layouts.head')
+@extends('layouts.app')
+@extends('layouts.footer')
+@extends('layouts.navegacion')
