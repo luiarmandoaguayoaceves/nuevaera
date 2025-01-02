@@ -13,6 +13,7 @@
         @yield('navegacion')
 
         @yield('contenido')
+        @yield('galeria')
 
         @yield('footer')
     </body>
