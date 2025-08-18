@@ -36,14 +36,32 @@
         <section id="galeria" class="py-16">
             <h2 class="text-2xl font-bold text-center mb-8">Galería</h2>
             <div class="mx-auto max-w-5xl grid grid-cols-2 md:grid-cols-3 gap-4 px-4">
-                <img src="/img/galeria/1.jpeg" alt="Producto 1" class="object-cover w-full h-48 rounded">
-                <img src="/img/galeria/2.jpeg" alt="Producto 2" class="object-cover w-full h-48 rounded">
-                <img src="/img/galeria/3.jpeg" alt="Producto 3" class="object-cover w-full h-48 rounded">
-                <img src="/img/galeria/4.jpeg" alt="Producto 4" class="object-cover w-full h-48 rounded">
-                <img src="/img/galeria/5.jpeg" alt="Producto 5" class="object-cover w-full h-48 rounded">
-                <img src="/img/galeria/6.jpeg" alt="Producto 6" class="object-cover w-full h-48 rounded">
+                <button class="group relative overflow-hidden rounded shadow" data-image="/img/galeria/1.jpeg">
+                    <img src="/img/galeria/1.jpeg" alt="Producto 1" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
+                </button>
+                <button class="group relative overflow-hidden rounded shadow" data-image="/img/galeria/2.jpeg">
+                    <img src="/img/galeria/2.jpeg" alt="Producto 2" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
+                </button>
+                <button class="group relative overflow-hidden rounded shadow" data-image="/img/galeria/3.jpeg">
+                    <img src="/img/galeria/3.jpeg" alt="Producto 3" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
+                </button>
+                <button class="group relative overflow-hidden rounded shadow" data-image="/img/galeria/4.jpeg">
+                    <img src="/img/galeria/4.jpeg" alt="Producto 4" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
+                </button>
+                <button class="group relative overflow-hidden rounded shadow" data-image="/img/galeria/5.jpeg">
+                    <img src="/img/galeria/5.jpeg" alt="Producto 5" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
+                </button>
+                <button class="group relative overflow-hidden rounded shadow" data-image="/img/galeria/6.jpeg">
+                    <img src="/img/galeria/6.jpeg" alt="Producto 6" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
+                </button>
             </div>
         </section>
+
+        <!-- Lightbox -->
+        <div id="lightbox" class="fixed inset-0 hidden bg-black/80 items-center justify-center z-50">
+            <button id="lightbox-close" class="absolute top-4 right-4 text-white text-3xl" aria-label="Cerrar" >&times;</button>
+            <img id="lightbox-img" src="" alt="Imagen ampliada" class="max-h-full max-w-full rounded shadow-lg">
+        </div>
 
         <!-- Nosotros -->
         <section id="nosotros" class="bg-gray-50 py-16">
@@ -69,5 +87,28 @@
     <footer class="bg-white border-t py-4 text-center text-sm text-gray-500">
         &copy; {{ date('Y') }} Calzado Nueva Era. Todos los derechos reservados.
     </footer>
+
+    <script>
+        document.querySelectorAll('#galeria button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const src = btn.dataset.image;
+                document.getElementById('lightbox-img').src = src;
+                document.getElementById('lightbox').classList.remove('hidden');
+                document.getElementById('lightbox').classList.add('flex');
+            });
+        });
+
+        const closeLightbox = () => {
+            document.getElementById('lightbox').classList.add('hidden');
+            document.getElementById('lightbox').classList.remove('flex');
+        };
+
+        document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox') {
+                closeLightbox();
+            }
+        });
+    </script>
 </body>
 </html>
