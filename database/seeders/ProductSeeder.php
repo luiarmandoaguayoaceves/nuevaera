@@ -37,7 +37,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [23,24,25,26],
                 'badge' => 'Nuevo',
                 'categoria' => 'Tacón',
-                'imagenes' => ['/img/galeria/1.jpeg'],
+                'imagenes' => ['img/galeria/1.jpeg'],
             ],
             [
                 'modelo' => '1031',
@@ -47,7 +47,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [22,23,24],
                 'badge' => null,
                 'categoria' => 'Sandalia',
-                'imagenes' => ['/img/galeria/2.jpeg'],
+                'imagenes' => ['img/galeria/2.jpeg'],
             ],
             [
                 'modelo' => '1032',
@@ -57,7 +57,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [24,25,26],
                 'badge' => 'Oferta',
                 'categoria' => 'Casual',
-                'imagenes' => ['/img/galeria/3.jpeg'],
+                'imagenes' => ['img/galeria/3.jpeg'],
             ],
             [
                 'modelo' => '1033',
@@ -67,7 +67,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [22,23,24,25],
                 'badge' => 'Hecho en México',
                 'categoria' => 'Confort',
-                'imagenes' => ['/img/galeria/4.jpeg'],
+                'imagenes' => ['img/galeria/4.jpeg'],
             ],
             [
                 'modelo' => '1034',
@@ -77,7 +77,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [23,24,25],
                 'badge' => null,
                 'categoria' => 'Tacón',
-                'imagenes' => ['/img/galeria/5.jpeg'],
+                'imagenes' => ['img/galeria/5.jpeg'],
             ],
             [
                 'modelo' => '1035',
@@ -87,7 +87,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [22,23,24,25,26],
                 'badge' => 'Edición especial',
                 'categoria' => 'Sandalia',
-                'imagenes' => ['/img/galeria/6.jpeg'],
+                'imagenes' => ['img/galeria/6.jpeg'],
             ],
             [
                 'modelo' => '1036',
@@ -97,7 +97,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [24,25,26,27],
                 'badge' => null,
                 'categoria' => 'Casual',
-                'imagenes' => ['/img/galeria/7.jpeg'],
+                'imagenes' => ['img/galeria/7.jpeg'],
             ],
             [
                 'modelo' => '1037',
@@ -107,7 +107,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [23,24,25],
                 'badge' => 'Más vendido',
                 'categoria' => 'Confort',
-                'imagenes' => ['/img/galeria/8.jpeg'],
+                'imagenes' => ['img/galeria/8.jpeg'],
             ],
             [
                 'modelo' => '1038',
@@ -117,7 +117,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [22,23,24],
                 'badge' => null,
                 'categoria' => 'Sandalia',
-                'imagenes' => ['/img/galeria/9.jpeg'],
+                'imagenes' => ['img/galeria/9.jpeg'],
             ],
             [
                 'modelo' => '1039',
@@ -127,7 +127,7 @@ class ProductSeeder extends Seeder
                 'tallas' => [23,24,25,26],
                 'badge' => 'Nuevo',
                 'categoria' => 'Tacón',
-                'imagenes' => ['/img/galeria/10.jpeg'],
+                'imagenes' => ['img/galeria/10.jpeg'],
             ],
         ];
 

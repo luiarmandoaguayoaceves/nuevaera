@@ -21,6 +21,6 @@ class Product extends Model
     public function getImagenPrincipalAttribute()
     {
         $img = $this->images()->where('is_primary', true)->first() ?? $this->images()->first();
-        return $img?->path ? Storage::url($img->path) : null;
+        return $img?->path ? $img?->path : null;
     }
 }
