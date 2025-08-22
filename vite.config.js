@@ -1,14 +1,17 @@
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
+// vite.config.js
+import { defineConfig } from 'vite'
+import laravel from 'laravel-vite-plugin'
 
 export default defineConfig({
-  build: {
-    outDir: 'dist', // Esto asegura que los archivos construidos se guardan en "dist"
-  },
   plugins: [
     laravel({
-      input: ['resources/css/app.css', 'resources/js/app.js'], // Incluye tus archivos
+      input: ['resources/css/app.css', 'resources/js/app.js'],
       refresh: true,
+      // Opcional: buildDirectory: 'build', // por defecto ya es 'build'
     }),
   ],
-});
+  server: {
+    host: true,
+    // hmr: { host: 'nuevaera.test' }, // si usas Laragon con dominio local
+  },
+})

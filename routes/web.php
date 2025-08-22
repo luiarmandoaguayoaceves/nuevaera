@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GalleryController;
 
-Route::view('/', 'home')->name('home');
+Route::get('/', fn() => redirect()->route('gallery.index'));
+Route::get('/galeria', [GalleryController::class, 'index'])->name('gallery.index');
 

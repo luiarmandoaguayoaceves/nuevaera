@@ -1,15 +1,11 @@
 {
-  "public/img/portada.webp": {
-    "file": "assets/portada-DbFl4N9e.webp",
-    "src": "public/img/portada.webp"
-  },
   "resources/css/app.css": {
-    "file": "assets/app-QjYCqOj8.css",
+    "file": "assets/app-BVHb4L6_.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-z-Rg4TxU.js",
+    "file": "assets/app-b_vDRAfE.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

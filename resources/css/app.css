@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer components{
+  .btn { @apply rounded-xl px-4 py-2 text-sm font-semibold; }
+  .btn-primary { @apply btn bg-black text-white hover:bg-gray-900; }
+  .btn-outline { @apply btn border border-gray-200 bg-white text-gray-900 hover:border-gray-300; }
+}
