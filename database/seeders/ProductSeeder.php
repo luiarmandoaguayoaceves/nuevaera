@@ -10,24 +10,18 @@ use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        // Aseguramos que existan categorías
-        $categorias = [
-            'Sandalia',
-            'Tacón',
-            'Casual',
-            'Confort',
-        ];
-
+        // 1) Categorías base
+        $categorias = ['Sandalia','Tacón','Casual','Confort'];
         foreach ($categorias as $catName) {
-            Category::firstOrCreate(
+            Category::updateOrCreate(
                 ['nombre' => $catName],
                 ['slug' => Str::slug($catName)]
             );
         }
 
-        // Productos de ejemplo
+        // 2) Productos de ejemplo
         $productos = [
             [
                 'modelo' => '1030',
@@ -132,23 +126,48 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($productos as $p) {
-            $categoria = Category::where('nombre', $p['categoria'])->first();
+            $categoria = Category::where('nombre', $p['categoria'])->firstOrFail();
 
-            $producto = Product::create([
-                'category_id' => $categoria->id,
-                'modelo'      => $p['modelo'],
-                'nombre'      => $p['nombre'],
-                'descripcion' => $p['descripcion'],
-                'precio'      => $p['precio'],
-                'tallas'      => $p['tallas'],
-                'badge'       => $p['badge'],
-                'activo'      => true,
-            ]);
+            // 2.1) Evitar duplicados por 'modelo'
+            $producto = Product::updateOrCreate(
+                ['modelo' => $p['modelo']], // <- clave única
+                [
+                    'category_id' => $categoria->id,
+                    'nombre'      => $p['nombre'],
+                    'descripcion' => $p['descripcion'],
+                    'precio'      => number_format((float)$p['precio'], 2, '.', ''),
+                    'tallas'      => $p['tallas'],
+                    'badge'       => $p['badge'],
+                    'activo'      => true,
+                ]
+            );
 
-            foreach ($p['imagenes'] as $i => $img) {
+            // 2.2) Reemplazar imágenes de ese producto con las indicadas en el seeder
+            $producto->images()->delete();
+
+            foreach ($p['imagenes'] as $i => $relPath) {
+                $path = ltrim($relPath, '/');
+
+                // Si no existe .jpeg, intenta .jpg o .webp (por si cambia la extensión)
+                if (!file_exists(public_path($path))) {
+                    $candidatos = [
+                        $path,
+                        preg_replace('/\.jpeg$/i', '.jpg', $path),
+                        preg_replace('/\.jpg$/i', '.jpeg', $path),
+                        preg_replace('/\.(jpeg|jpg)$/i', '.webp', $path),
+                    ];
+                    foreach ($candidatos as $cand) {
+                        if ($cand && file_exists(public_path($cand))) {
+                            $path = $cand;
+                            break;
+                        }
+                    }
+                }
+
                 ProductImage::create([
                     'product_id' => $producto->id,
-                    'path'       => $img,
+                    'path'       => $path,                           // ej. 'img/galeria/1.jpeg'
+                    'alt'        => $producto->nombre.' '.($i + 1), // opcional
                     'is_primary' => $i === 0,
                     'orden'      => $i + 1,
                 ]);
