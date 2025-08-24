@@ -41,7 +41,7 @@
     <div class="flex items-start justify-between gap-3">
       <h3 class="text-sm font-semibold text-gray-900">Modelo {{ $modelo }}</h3>
       @if(!is_null($precio))
-        <p class="text-sm font-bold text-gray-900">${{ number_format($precio, 2) }} MXN</p>
+        {{-- <p class="text-sm font-bold text-gray-900">${{ number_format($precio, 2) }} MXN</p> --}}
       @endif
     </div>
     @if($catStr)

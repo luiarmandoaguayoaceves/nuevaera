@@ -3,8 +3,20 @@
 @tailwind utilities;
 
 
-@layer components{
-  .btn { @apply rounded-xl px-4 py-2 text-sm font-semibold; }
-  .btn-primary { @apply btn bg-black text-white hover:bg-gray-900; }
-  .btn-outline { @apply btn border border-gray-200 bg-white text-gray-900 hover:border-gray-300; }
+@layer components {
+  .form-card { @apply bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm; }
+  .form-section { @apply border border-slate-200 rounded-xl bg-white/80 p-4 md:p-5; }
+  .form-title { @apply text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3; }
+
+  .label { @apply block text-sm font-medium text-slate-700; }
+  .hint  { @apply text-xs text-slate-500 mt-1; }
+
+  .input { @apply mt-1 w-full rounded-xl border-2 border-slate-300 bg-white/90 placeholder-slate-400
+                   focus:border-slate-900 focus:ring-2 focus:ring-slate-900/20; }
+  .select { @apply input; }
+  .textarea { @apply input min-h-[84px]; }
+
+  .btn-primary { @apply rounded-xl bg-slate-900 text-white px-4 py-2.5 font-medium hover:bg-black transition; }
+  .btn-muted   { @apply rounded-xl bg-slate-200 text-slate-800 px-3 py-2 text-sm hover:bg-slate-300; }
+  .badge { @apply inline-block text-[10px] px-1.5 py-0.5 rounded bg-black/70 text-white; }
 }

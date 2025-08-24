@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class GalleryController extends Controller
 {
-    // PÚBLICO
+    // VISTA PÚBLICA (igual a como la tienes)
     public function index()
     {
         $productos = Product::with(['images','category'])
@@ -23,20 +25,66 @@ class GalleryController extends Controller
         return view('gallery.index', compact('productos','categorias','tallas'));
     }
 
-    // ADMIN
+    // PANEL ADMIN
     public function admin()
     {
         $productos = Product::with(['images' => fn($q) => $q->orderBy('orden'),'category'])
             ->latest()
             ->paginate(20);
 
-        return view('admin.galeria.index', compact('productos'));
+        $categorias = Category::orderBy('nombre')->get(['id','nombre']);
+        $siguienteModelo = (string) (((int) (Product::max('modelo') ?? 1000)) + 1);
+
+        return view('admin.galeria.index', compact('productos','categorias','siguienteModelo'));
     }
 
+    // CREAR PRODUCTO (con opción de subir imágenes de una vez)
+    public function storeProduct(Request $request)
+    {
+        $data = $request->validate([
+            'modelo'      => ['required','string','max:100', 'unique:products,modelo'],
+            'nombre'      => ['required','string','max:150'],
+            'descripcion' => ['nullable','string','max:5000'],
+            'precio'      => ['required','numeric','min:0','max:999999.99'],
+            'tallas'      => ['nullable','string'], // "22,23,24"
+            'badge'       => ['nullable','string','max:50'],
+            'activo'      => ['required','boolean'],
+            'category_id' => ['nullable','integer','exists:categories,id'],
+
+            // opcional: subir imágenes en el mismo form
+            'files.*'     => ['sometimes','image','mimes:jpg,jpeg,png,webp,avif','max:5120'],
+        ]);
+
+        $data['tallas'] = !empty($data['tallas'])
+            ? collect(explode(',', $data['tallas']))->map(fn($t)=>trim($t))->filter()->values()->all()
+            : [];
+
+        $data['precio'] = number_format((float)$data['precio'], 2, '.', '');
+
+        $product = Product::create($data);
+
+        // Si enviaste imágenes en el form de creación
+        if ($request->hasFile('files')) {
+            $current = 0;
+            foreach ($request->file('files', []) as $i => $file) {
+                $path = $file->store('productos', 'public');
+                $product->images()->create([
+                    'path'       => $path,
+                    'alt'        => $product->nombre.' '.($i+1),
+                    'is_primary' => $i === 0,
+                    'orden'      => ++$current,
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.galeria.index')->with('ok', "Producto creado.");
+    }
+
+    // ACTUALIZAR PRODUCTO
     public function updateProduct(Request $request, Product $product)
     {
         $data = $request->validate([
-            'modelo'      => ['required','string','max:100'],
+            'modelo'      => ['required','string','max:100', Rule::unique('products','modelo')->ignore($product->id)],
             'nombre'      => ['required','string','max:150'],
             'descripcion' => ['nullable','string','max:5000'],
             'precio'      => ['required','numeric','min:0','max:999999.99'],
@@ -51,96 +99,32 @@ class GalleryController extends Controller
             : [];
 
         $data['precio'] = number_format((float)$data['precio'], 2, '.', '');
+
         $product->update($data);
 
         return back()->with('ok', "Producto #{$product->id} actualizado.");
     }
 
-    // SUBIDA MÚLTIPLE: usa alt y orden incremental
-    public function uploadImages(Request $request, Product $product)
+    // APAGAR / PRENDER (toggle activo)
+    public function toggleProduct(Product $product)
     {
-        $request->validate([
-            'files.*' => ['required','image','mimes:jpg,jpeg,png,webp,avif','max:5120'],
-        ], ['files.*.image' => 'Cada archivo debe ser una imagen válida.']);
-
-        $uploaded = [];
-        $currentMax = (int) ($product->images()->max('orden') ?? 0);
-
-        foreach ($request->file('files', []) as $file) {
-            $path = $file->store('productos', 'public');
-            $alt  = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME); // default legible
-            $orden = ++$currentMax;
-
-            $img = $product->images()->create([
-                'path'       => $path,
-                'alt'        => $alt,
-                'is_primary' => $product->images()->count() === 0,
-                'orden'      => $orden,
-            ]);
-
-            $uploaded[] = $img;
-        }
-
-        if ($request->wantsJson()) {
-            return response()->json(['ok' => true, 'images' => $uploaded, 'base_url' => asset('storage')]);
-        }
-
-        return back()->with('ok', 'Imágenes subidas.');
+        $product->update(['activo' => !$product->activo]);
+        return back()->with('ok', "Producto #{$product->id} " . ($product->activo ? 'activado' : 'desactivado') . '.');
     }
 
-    // EDITAR ALT (y opcionalmente reorden individual)
-    public function updateImage(Request $request, ProductImage $image)
+    // ELIMINAR PRODUCTO (borra imágenes físicas)
+    public function destroyProduct(Product $product)
     {
-        $data = $request->validate([
-            'alt'   => ['nullable','string','max:255'],
-            'orden' => ['nullable','integer','min:0'],
-        ]);
-
-        $image->update($data);
-
-        return back()->with('ok', 'Imagen actualizada.');
-    }
-
-    public function destroyImage(ProductImage $image)
-    {
-        $product = $image->product;
-
-        if ($image->path && Storage::disk('public')->exists($image->path)) {
-            Storage::disk('public')->delete($image->path);
+        foreach ($product->images as $img) {
+            if ($img->path && Storage::disk('public')->exists($img->path)) {
+                Storage::disk('public')->delete($img->path);
+            }
+            $img->delete();
         }
-        $image->delete();
+        $product->delete();
 
-        if ($product && !$product->images()->where('is_primary', true)->exists()) {
-            $next = $product->images()->orderBy('orden')->first();
-            if ($next) $next->update(['is_primary' => true]);
-        }
-
-        return back()->with('ok', 'Imagen eliminada.');
+        return back()->with('ok', 'Producto eliminado.');
     }
 
-    public function makePrimary(ProductImage $image)
-    {
-        $product = $image->product;
-        $product->images()->update(['is_primary' => false]);
-        $image->update(['is_primary' => true]);
-
-        return back()->with('ok', 'Imagen principal actualizada.');
-    }
-
-    // arrastrar y soltar
-    // payload: images: [{id: 10, orden:1}, ...]
-    public function sortImages(Request $request)
-    {
-        $data = $request->validate([
-            'images' => ['required','array'],
-            'images.*.id'    => ['required','integer','exists:product_images,id'],
-            'images.*.orden' => ['required','integer','min:0'],
-        ]);
-
-        foreach ($data['images'] as $i) {
-            ProductImage::where('id', $i['id'])->update(['orden' => $i['orden']]);
-        }
-
-        return response()->json(['ok' => true]);
-    }
+    // --- el resto de métodos de imágenes que ya tenías (uploadImages, updateImage, makePrimary, sortImages, destroyImage) ---
 }
