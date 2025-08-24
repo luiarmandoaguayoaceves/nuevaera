@@ -129,8 +129,8 @@
       <div class="mx-auto max-w-3xl px-4 text-center">
         <h2 class="text-2xl font-bold mb-4">Contacto</h2>
         <p class="mb-2">Teléfono: <a href="tel:+523331986670" class="text-accent">+52 333 198 6670</a></p>
-        <p class="mb-2">Correo: <a href="mailto:info@nuevaera.com" class="text-accent">info@nuevaera.com</a></p>
-        <p>Dirección: Calle Ejemplo 123, Ciudad, México</p>
+        <p class="mb-2">Correo: <a href="mailto:nuevaera2009@live.com.mx" class="text-accent">nuevaera2009@live.com.mx</a></p>
+        <p>Dirección: Guadalajara Jalisco México</p>
       </div>
     </section>
   </main>
