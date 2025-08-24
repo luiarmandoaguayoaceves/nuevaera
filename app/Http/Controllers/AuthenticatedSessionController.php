@@ -18,7 +18,7 @@ class AuthenticatedSessionController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended(route('gallery.admin.index'));
+            return redirect()->intended(route('admin.galeria.index'));
         }
 
         return back()->withErrors(['email' => 'Credenciales inválidas.'])->onlyInput('email');
