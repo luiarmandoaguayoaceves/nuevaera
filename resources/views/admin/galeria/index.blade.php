@@ -199,56 +199,56 @@
     // Define the route URL using Blade outside the script logic
     const galeriaImagesSortUrl = "{{ route('admin.galeria.images.sort') }}";
     (function() {
-        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        // Añade DnD a todos los grids de productos
-        document.querySelectorAll('[id^="grid-"]').forEach(setupGrid);
+            // Añade DnD a todos los grids de productos
+            document.querySelectorAll('[id^="grid-"]').forEach(setupGrid);
 
-        function setupGrid(grid) {
-            let dragged = null;
+            function setupGrid(grid) {
+                let dragged = null;
 
-            grid.addEventListener('dragstart', (e) => {
-                const card = e.target.closest('[data-image-id]');
-                if (!card) return;
-                dragged = card;
-                card.classList.add('ring', 'ring-gray-300');
-                e.dataTransfer.effectAllowed = 'move';
-            });
+                grid.addEventListener('dragstart', (e) => {
+                    const card = e.target.closest('[data-image-id]');
+                    if (!card) return;
+                    dragged = card;
+                    card.classList.add('ring', 'ring-gray-300');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
 
-            grid.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                const over = e.target.closest('[data-image-id]');
-                if (!dragged || !over || dragged === over) return;
+                grid.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    const over = e.target.closest('[data-image-id]');
+                    if (!dragged || !over || dragged === over) return;
 
-                // Inserta antes o después según la posición del ratón
-                const rect = over.getBoundingClientRect();
-                const before = (e.clientY - rect.top) < rect.height / 2;
-                over.parentNode.insertBefore(dragged, before ? over : over.nextSibling);
-            });
+                    // Inserta antes o después según la posición del ratón
+                    const rect = over.getBoundingClientRect();
+                    const before = (e.clientY - rect.top) < rect.height / 2;
+                    over.parentNode.insertBefore(dragged, before ? over : over.nextSibling);
+                });
 
-            grid.addEventListener('drop', async (e) => {
-                e.preventDefault();
-                if (dragged) {
-                    dragged.classList.remove('ring', 'ring-gray-300');
+                grid.addEventListener('drop', async (e) => {
+                    e.preventDefault();
+                    if (dragged) {
+                        dragged.classList.remove('ring', 'ring-gray-300');
+                        dragged = null;
+                        await saveOrder(grid);
+                    }
+                });
+
+                grid.addEventListener('dragend', () => {
+                    if (dragged) dragged.classList.remove('ring', 'ring-gray-300');
                     dragged = null;
-                    await saveOrder(grid);
-                }
-            });
+                });
+            }
 
-            grid.addEventListener('dragend', () => {
-                if (dragged) dragged.classList.remove('ring', 'ring-gray-300');
-                dragged = null;
-            });
-        }
+            async function saveOrder(grid) {
+                const productId = grid.getAttribute('data-product-id');
+                const payload = Array.from(grid.querySelectorAll('[data-image-id]')).map((el, idx) => ({
+                    id: parseInt(el.getAttribute('data-image-id')),
+                    orden: idx + 1
+                }));
 
-        async function saveOrder(grid) {
-            const productId = grid.getAttribute('data-product-id');
-            const payload = Array.from(grid.querySelectorAll('[data-image-id]')).map((el, idx) => ({
-                id: parseInt(el.getAttribute('data-image-id')),
-                orden: idx + 1
-            }));
 
-                const res = await fetch(galeriaImagesSortUrl, {
                 const res = await fetch(galeriaImagesSortUrl, {
                     method: 'PATCH',
                     headers: {
@@ -269,6 +269,5 @@
                 alert('No se pudo guardar el orden. Reintenta.');
                 console.error(err);
             }
-        }
-    })();
+        })();
 </script>
