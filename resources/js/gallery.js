@@ -78,8 +78,8 @@ function attachEvents() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  // añade dataset talla
-  grid.querySelectorAll('.talla-pill').forEach(p => p.setAttribute('data-talla', p.textContent.replace('T','')));
-  attachEvents();
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//   // añade dataset talla
+//   grid.querySelectorAll('.talla-pill').forEach(p => p.setAttribute('data-talla', p.textContent.replace('T','')));
+//   attachEvents();
+// });
