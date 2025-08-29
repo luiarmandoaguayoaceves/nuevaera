@@ -20,9 +20,9 @@ class GalleryController extends Controller
             ->paginate(12);
 
         $categorias = Category::orderBy('nombre')->get();
-        $tallas     = [22,23,24,25,26,27];
+        $tallas     = [22, 23, 24, 25, 26, 27];
 
-        return view('gallery.index', compact('productos','categorias','tallas'));
+        return view('gallery.index', compact('productos', 'categorias', 'tallas'));
     }
 
     // Vista admin
@@ -37,7 +37,7 @@ class GalleryController extends Controller
         $ultimo = Product::max('modelo');
         $siguienteModelo = $ultimo ? (string)((int)$ultimo + 1) : '1000';
 
-        return view('admin.galeria.index', compact('productos','categorias','siguienteModelo'));
+        return view('admin.galeria.index', compact('productos', 'categorias', 'siguienteModelo'));
     }
 
     // --- CRUD PRODUCTO ---
@@ -45,15 +45,15 @@ class GalleryController extends Controller
     public function storeProduct(Request $request)
     {
         $data = $request->validate([
-            'modelo'      => ['required','string','max:50','unique:products,modelo'],
-            'nombre'      => ['required','string','max:255'],
-            'descripcion' => ['nullable','string'],
-            'precio'      => ['nullable','numeric','min:0'],
-            'tallas'      => ['nullable','string'], // ej: "22,23,24"
-            'badge'       => ['nullable','string','max:50'],
-            'category_id' => ['nullable','exists:categories,id'],
-            'activo'      => ['required','in:0,1'],
-            'files.*'     => ['nullable','image','max:5120'], // 5MB c/u
+            'modelo'      => ['required', 'string', 'max:50', 'unique:products,modelo'],
+            'nombre'      => ['required', 'string', 'max:255'],
+            'descripcion' => ['nullable', 'string'],
+            'precio'      => ['nullable', 'numeric', 'min:0'],
+            'tallas'      => ['nullable', 'string'], // ej: "22,23,24"
+            'badge'       => ['nullable', 'string', 'max:50'],
+            'category_id' => ['nullable', 'exists:categories,id'],
+            'activo'      => ['required', 'in:0,1'],
+            'files.*'     => ['nullable', 'image', 'max:5120'], // 5MB c/u
         ]);
 
         $data['tallas'] = $this->parseTallas($data['tallas'] ?? '');
@@ -77,28 +77,30 @@ class GalleryController extends Controller
             }
         }
 
-        return back()->with('ok','Producto creado');
+        return back()->with('ok', 'Producto creado');
     }
 
     public function updateProduct(Request $request, Product $product)
     {
         $data = $request->validate([
-            'modelo'      => ['required','string','max:50','unique:products,modelo,'.$product->id],
-            'nombre'      => ['required','string','max:255'],
-            'descripcion' => ['nullable','string'],
-            'precio'      => ['nullable','numeric','min:0'],
-            'tallas'      => ['nullable','string'],
-            'badge'       => ['nullable','string','max:50'],
-            'category_id' => ['nullable','exists:categories,id'],
-            'activo'      => ['required','in:0,1'],
+            'modelo'      => ['required', 'string', 'max:50', 'unique:products,modelo'],
+            'nombre'      => ['required', 'string', 'max:255'],
+            'descripcion' => ['nullable', 'string'],
+            'precio'      => ['nullable', 'numeric', 'min:0'],
+            'tallas'      => ['nullable', 'string'], // "22,23,24"
+            'badge'       => ['nullable', 'string', 'max:50'],
+            'category_id' => ['required', 'exists:categories,id'], // <- requerido
+            'activo'      => ['required', 'in:0,1'],
+            'files.*'     => ['nullable', 'image', 'max:5120'],
         ]);
+
 
         $data['tallas'] = $this->parseTallas($data['tallas'] ?? '');
         $data['activo'] = (bool) $data['activo'];
 
         $product->update($data);
 
-        return back()->with('ok','Producto actualizado');
+        return back()->with('ok', 'Producto actualizado');
     }
 
     public function toggleProduct(Product $product)
@@ -126,7 +128,7 @@ class GalleryController extends Controller
     public function uploadImages(Request $request, Product $product)
     {
         $request->validate([
-            'files.*' => ['required','image','max:5120']
+            'files.*' => ['required', 'image', 'max:5120']
         ]);
 
         $ordenBase = (int) ($product->images()->max('orden') ?? 0);
@@ -143,14 +145,14 @@ class GalleryController extends Controller
             $i++;
         }
 
-        return back()->with('ok','Imágenes cargadas');
+        return back()->with('ok', 'Imágenes cargadas');
     }
 
     public function updateImage(Request $request, ProductImage $image)
     {
-        $request->validate(['alt' => ['nullable','string','max:255']]);
+        $request->validate(['alt' => ['nullable', 'string', 'max:255']]);
         $image->update(['alt' => $request->input('alt')]);
-        return back()->with('ok','ALT actualizado');
+        return back()->with('ok', 'ALT actualizado');
     }
 
     public function makePrimary(ProductImage $image)
@@ -159,16 +161,16 @@ class GalleryController extends Controller
             ProductImage::where('product_id', $image->product_id)->update(['is_primary' => false]);
             $image->update(['is_primary' => true]);
         });
-        return back()->with('ok','Marcada como principal');
+        return back()->with('ok', 'Marcada como principal');
     }
 
     public function sortImages(Request $request)
     {
         $data = $request->validate([
-            'product_id' => ['required','exists:products,id'],
-            'images'     => ['required','array'],
-            'images.*.id'    => ['required','exists:product_images,id'],
-            'images.*.orden' => ['required','integer','min:1'],
+            'product_id' => ['required', 'exists:products,id'],
+            'images'     => ['required', 'array'],
+            'images.*.id'    => ['required', 'exists:product_images,id'],
+            'images.*.orden' => ['required', 'integer', 'min:1'],
         ]);
 
         DB::transaction(function () use ($data) {
@@ -196,7 +198,7 @@ class GalleryController extends Controller
             if ($next) $next->update(['is_primary' => true]);
         }
 
-        return back()->with('ok','Imagen eliminada');
+        return back()->with('ok', 'Imagen eliminada');
     }
 
     // --- helper ---
