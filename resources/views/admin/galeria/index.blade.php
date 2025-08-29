@@ -196,6 +196,8 @@
 
 
 <script>
+    // Define the route URL using Blade outside the script logic
+    const galeriaImagesSortUrl = "{{ route('admin.galeria.images.sort') }}";
     (function() {
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -246,8 +248,8 @@
                 orden: idx + 1
             }));
 
-            try {
-                const res = await fetch(`{{ route('admin.galeria.images.sort') }}`, {
+                const res = await fetch(galeriaImagesSortUrl, {
+                const res = await fetch(galeriaImagesSortUrl, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -259,7 +261,6 @@
                         product_id: productId
                     })
                 });
-
                 if (!res.ok) throw new Error('Error al guardar el orden');
                 // (Opcional) feedback visual
                 grid.classList.add('outline', 'outline-2', 'outline-green-300');
