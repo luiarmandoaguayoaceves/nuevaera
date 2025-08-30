@@ -45,7 +45,7 @@ class GalleryController extends Controller
     public function storeProduct(Request $request)
     {
         $data = $request->validate([
-            'modelo'      => ['required', 'string', 'max:50', 'unique:products,modelo'],
+            'modelo'      => ['required', 'string', 'max:50'],
             'nombre'      => ['required', 'string', 'max:255'],
             'descripcion' => ['nullable', 'string'],
             'precio'      => ['nullable', 'numeric', 'min:0'],
@@ -83,7 +83,7 @@ class GalleryController extends Controller
     public function updateProduct(Request $request, Product $product)
     {
         $data = $request->validate([
-            'modelo'      => ['required', 'string', 'max:50', 'unique:products,modelo'],
+            'modelo'      => ['required', 'string', 'max:50'],
             'nombre'      => ['required', 'string', 'max:255'],
             'descripcion' => ['nullable', 'string'],
             'precio'      => ['nullable', 'numeric', 'min:0'],

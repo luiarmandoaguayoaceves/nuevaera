@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
-            $table->string('modelo')->unique();           // p.ej. 1030
+            $table->string('modelo');           // p.ej. 1030
             $table->string('nombre')->nullable();         // opcional: “Sandalia Roma”
             $table->text('descripcion')->nullable();
             $table->decimal('precio', 10, 2)->nullable(); // si no lo publicas, déjalo null
