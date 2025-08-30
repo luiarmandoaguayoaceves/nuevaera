@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\Category;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator ;
 
 class GalleryController extends Controller
 {
@@ -44,28 +46,35 @@ class GalleryController extends Controller
 
     public function storeProduct(Request $request)
     {
-        $data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'modelo'      => ['required', 'string', 'max:50'],
             'nombre'      => ['required', 'string', 'max:255'],
             'descripcion' => ['nullable', 'string'],
             'precio'      => ['nullable', 'numeric', 'min:0'],
-            'tallas'      => ['nullable', 'string'], // ej: "22,23,24"
+            'tallas'      => ['nullable', 'string'],
             'badge'       => ['nullable', 'string', 'max:50'],
             'category_id' => ['nullable', 'exists:categories,id'],
             'activo'      => ['required', 'in:0,1'],
-            'files.*'     => ['nullable', 'image', 'max:5120'], // 5MB c/u
+            'files.*'     => ['nullable', 'image', 'max:5120'],
         ]);
 
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Por favor corrige los errores en el formulario.');
+        }
+
+        $data = $validator->validated();
         $data['tallas'] = $this->parseTallas($data['tallas'] ?? '');
         $data['activo'] = (bool) $data['activo'];
 
         $product = Product::create($data);
 
-        // imágenes (opcional)
         if ($request->hasFile('files')) {
             $i = 0;
             foreach ($request->file('files') as $file) {
-                $path = $file->store('galeria', 'public'); // storage/app/public/galeria/...
+                $path = $file->store('galeria', 'public');
                 ProductImage::create([
                     'product_id' => $product->id,
                     'path'       => $path,
