@@ -84,6 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
     el.setAttribute('data-talla', el.textContent.replace('T', ''));
   });
 
+  attachEvents();
+
   // solo si Wn existe
   if (typeof window.Wn === 'function') {
     window.Wn();
