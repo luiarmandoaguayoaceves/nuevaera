@@ -5,11 +5,11 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\AuthenticatedSessionController;
 
 // PÚBLICAS (tuyas)
-Route::get('/', fn() => redirect()->route('gallery.index'));
-Route::get('/galeria', [GalleryController::class, 'index'])->name('gallery.index');
+
+Route::get('/', [GalleryController::class, 'index'])->name('gallery.index');
 
 // ADMIN (protegidas)
-Route::middleware('auth')->prefix('admin/galeria')->name('admin.galeria.')->group(function () {
+Route::middleware('auth')->prefix('admin')->name('admin.galeria.')->group(function () {
     Route::get('/', [GalleryController::class, 'admin'])->name('index');
 
     // CRUD producto
@@ -24,6 +24,9 @@ Route::middleware('auth')->prefix('admin/galeria')->name('admin.galeria.')->grou
     Route::patch('/images/{image}/primary', [GalleryController::class, 'makePrimary'])->name('images.primary');
     Route::patch('/images/sort', [GalleryController::class, 'sortImages'])->name('images.sort');
     Route::delete('/images/{image}', [GalleryController::class, 'destroyImage'])->name('images.destroy');
+    // routes/web.php (dentro del group admin)
+    Route::patch('/images/{image}/replace', [GalleryController::class, 'replaceImage'])->name('images.replace');
+
 });
 
 

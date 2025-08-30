@@ -9,7 +9,8 @@ use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator ;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class GalleryController extends Controller
 {
@@ -20,6 +21,7 @@ class GalleryController extends Controller
             ->where('activo', true)
             ->latest()
             ->paginate(12);
+
 
         $categorias = Category::orderBy('nombre')->get();
         $tallas     = [22, 23, 24, 25, 26, 27];
@@ -220,5 +222,29 @@ class GalleryController extends Controller
             ->map(fn($v) => (int)$v)
             ->values()
             ->all();
+    }
+
+    public function replaceImage(Request $request, ProductImage $image)
+    {
+        $data = $request->validate([
+            'file' => ['required', 'image', 'max:5120'], // 5 MB
+            'alt'  => ['nullable', 'string', 'max:255'],
+        ]);
+
+        // Subir nueva
+        $newPath = $request->file('file')->store('galeria', 'public');
+
+        // Borrar antigua si está en el disk public (no borra URLs externas)
+        if ($image->path && Storage::disk('public')->exists($image->path)) {
+            Storage::disk('public')->delete($image->path);
+        }
+
+        // Actualizar registro
+        $image->update([
+            'path' => $newPath,
+            'alt'  => $data['alt'] ?? $image->alt,
+        ]);
+
+        return back()->with('ok', 'Imagen reemplazada');
     }
 }
