@@ -2,48 +2,63 @@
 
 @section('title','Galería | Calzado Nueva Era')
 
-@php
-  // WhatsApp en formato internacional sin símbolos
-  $whats = '523331986670';
-@endphp
-
 @section('content')
-  {{-- Hero con overlay y CTA --}}
-  <x-gallery.hero />
+  {{-- Hero --}}
+  <section id="inicio" class="relative grid place-items-center h-[50vh]">
+    <img src="{{ asset('img/portada.webp') }}" alt="Colección Nueva Era" class="absolute inset-0 h-full w-full object-cover">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="relative z-10 px-4 text-center text-white">
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">Calzado Nueva Era</h1>
+      <p class="mt-3 max-w-xl mx-auto text-white/90">Calidad, comodidad y estilo para cada día.</p>
+      <div class="mt-6">
+        <a href="#galeria" class="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow hover:bg-gray-100">Ver galería</a>
+      </div>
+    </div>
+  </section>
 
   {{-- Galería --}}
   <section id="galeria" class="py-14">
     <div class="mx-auto max-w-7xl px-4">
-
-      {{-- Título + filtros --}}
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">Colección</h2>
           <p class="text-gray-600 mt-1">Hecho en México 🇲🇽 • Envíos a todo el país</p>
         </div>
-
-        <x-gallery.filters :categorias="$categorias" :tallas="$tallas" />
+        {{-- Filtros (client-side) --}}
+        <form id="filters" class="grid grid-cols-2 md:flex gap-2">
+          <input id="q" type="text" placeholder="Buscar modelo o color…"
+                 class="col-span-2 md:col-span-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm placeholder:text-gray-400 focus:border-gray-900 focus:ring-0">
+          <select id="cat" class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm">
+            <option value="">Categoría</option>
+            @foreach($categorias as $c)
+              @php $label = is_object($c) ? ($c->nombre ?? (string)$c) : $c; @endphp
+              <option value="{{ $label }}">{{ ucfirst($label) }}</option>
+            @endforeach
+          </select>
+          <select id="size" class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm">
+            <option value="">Talla</option>
+            @foreach($tallas as $t)
+              <option>{{ $t }}</option>
+            @endforeach
+          </select>
+        </form>
       </div>
 
-      {{-- Grupos por producto --}}
-      <div id="products" class="mt-10 space-y-12">
-        @forelse($productos as $p)
-          <x-product.group :product="$p" />
-        @empty
-          <div class="rounded-2xl border border-gray-200 bg-white p-6 text-sm text-gray-600">
-            No hay productos activos por ahora.
-          </div>
-        @endforelse
-      </div>
+      {{-- GRID --}}
+      <ul id="grid" class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        @foreach($productos as $p)
+          <x-product.card :product="$p" />
+        @endforeach
+      </ul>
 
-      {{-- Paginación --}}
+      {{-- Paginación server-side (opcional, si quieres en vez de “cargar más”) --}}
       <div class="mt-10">
         {{ $productos->onEachSide(1)->links() }}
       </div>
     </div>
   </section>
 
-  {{-- Secciones informativas --}}
+  {{-- Nosotros / Contacto simples (puedes extraer a parciales si quieres) --}}
   <section id="nosotros" class="bg-gray-50 py-16">
     <div class="mx-auto max-w-3xl px-4 text-center">
       <h2 class="text-2xl font-bold mb-3">Sobre nosotros</h2>
@@ -54,17 +69,12 @@
   <section id="contacto" class="py-16">
     <div class="mx-auto max-w-3xl px-4 text-center">
       <h2 class="text-2xl font-bold mb-4">Contacto</h2>
-      <p class="mb-2">Teléfono: <a href="tel:+523331986670" class="text-rose-600 hover:text-rose-700">+52 333 198 6670</a></p>
-      <p class="mb-2">Correo: <a href="mailto:nuevaera2009@live.com.mx" class="text-rose-600 hover:text-rose-700">nuevaera2009@live.com.mx</a></p>
+      <p class="mb-2">Teléfono: <a href="tel:+523331986670" class="text-rose-500">+52 333 198 6670</a></p>
+      <p class="mb-2">Correo: <a href="mailto:nuevaera2009@live.com.mx" class="text-rose-500">nuevaera2009@live.com.mx</a></p>
       <p>Dirección: Guadalajara Jalisco México</p>
     </div>
   </section>
 
-  {{-- Lightbox global --}}
-  <x-ui.lightbox :whats="$whats" />
+  {{-- Lightbox --}}
+  <x-ui.lightbox />
 @endsection
-
-{{-- Carga el JS de galería (Vite) --}}
-@push('scripts')
-  @vite('resources/js/gallery.js')
-@endpush
