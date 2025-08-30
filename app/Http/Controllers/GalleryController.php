@@ -26,6 +26,11 @@ class GalleryController extends Controller
         $categorias = Category::orderBy('nombre')->get();
         $tallas     = [22, 23, 24, 25, 26, 27];
 
+        // Salvaguarda: si la vista no existe en el despliegue, evita 500
+        if (!view()->exists('gallery.index')) {
+            abort(503, 'Vista no disponible');
+        }
+
         return view('gallery.index', compact('productos', 'categorias', 'tallas'));
     }
 
