@@ -12,14 +12,7 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1) Categorías base
-        $categorias = ['Sandalia','Tacón','Casual','Confort'];
-        foreach ($categorias as $catName) {
-            Category::updateOrCreate(
-                ['nombre' => $catName],
-                ['slug' => Str::slug($catName)]
-            );
-        }
+        
 
         // 2) Productos de ejemplo
         $productos = [
@@ -129,9 +122,9 @@ class ProductSeeder extends Seeder
             $categoria = Category::where('nombre', $p['categoria'])->firstOrFail();
 
             // 2.1) Evitar duplicados por 'modelo'
-            $producto = Product::updateOrCreate(
-                ['modelo' => $p['modelo']], // <- clave única
+            $producto = Product::Create(
                 [
+                    'modelo' => $p['modelo'],
                     'category_id' => $categoria->id,
                     'nombre'      => $p['nombre'],
                     'descripcion' => $p['descripcion'],
