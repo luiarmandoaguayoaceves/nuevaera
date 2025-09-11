@@ -77,4 +77,6 @@
 
   {{-- Lightbox --}}
   <x-ui.lightbox />
+  {{-- Vista rápida --}}
+  <x-ui.quick-view />
 @endsection
