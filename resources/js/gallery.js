@@ -44,9 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     (map[g] ||= []).push(el);
   });
 
-  const lb       = document.getElementById('lb');
-  const backdrop = lb?.children?.[0];
-  const figure   = lb?.querySelector('figure');
+  const lb       = document.getElementById('lightbox');
   const lbImg    = document.getElementById('lbImg');
   const lbTitle  = document.getElementById('lbTitle');
   const lbWapp   = document.getElementById('lbWapp');
@@ -58,20 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let gKey = null, idx = 0;
 
   const setVisible = (v) => {
-    if (!lb || !backdrop || !figure) return;
-    if (v) {
-      lb.classList.remove('hidden');
-      requestAnimationFrame(() => {
-        backdrop.classList.remove('opacity-0');
-        figure.classList.remove('opacity-0','scale-95');
-      });
-      document.body.style.overflow = 'hidden';
-    } else {
-      backdrop.classList.add('opacity-0');
-      figure.classList.add('opacity-0','scale-95');
-      setTimeout(() => lb.classList.add('hidden'), 180);
-      document.body.style.overflow = '';
-    }
+    if (!lb) return;
+    lb.classList.toggle('hidden', !v);
+    document.body.style.overflow = v ? 'hidden' : '';
   };
 
   const composeWappLink = (modelo, nombre, imgUrl) => {
@@ -107,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
   lbClose?.addEventListener('click', () => setVisible(false));
   lbPrev?.addEventListener('click', () => move(-1));
   lbNext?.addEventListener('click', () => move(1));
-  backdrop?.addEventListener('click', () => setVisible(false));
+  lb?.addEventListener('click', (e) => { if (e.target === lb) setVisible(false); });
 
   window.addEventListener('keydown', (e) => {
     if (lb?.classList.contains('hidden')) return;

@@ -23,7 +23,7 @@
       <div class="absolute inset-0 animate-pulse bg-gray-200"></div>
       <img src="{{ $img }}" alt="Modelo {{ $modelo }} - Calzado"
            loading="lazy" decoding="async"
-           class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+           class="h-full w-full object-contain transition duration-500 group-hover:scale-105"
            onload="this.previousElementSibling?.remove()">
       @if($badge)
         <span class="absolute left-3 top-3 rounded-full bg-black/80 px-3 py-1 text-xs font-semibold text-white shadow">
