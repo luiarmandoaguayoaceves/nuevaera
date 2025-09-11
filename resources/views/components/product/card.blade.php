@@ -10,6 +10,7 @@
   $catStr = $product->category->slug ?? $product->category->nombre ?? ($product->categoria ?? '');
   $tallas = is_array($product->tallas ?? null) ? $product->tallas : [];
   $imgs   = $product->images->pluck('url');
+  $hasManyColors = $product->images->count() > 1;
 @endphp
 
 <li
@@ -48,6 +49,9 @@
     </div>
     @if($catStr)
       <p class="text-xs text-gray-500 capitalize">{{ $catStr }}</p>
+    @endif
+    @if($hasManyColors)
+      <p class="text-xs text-rose-500">Disponible en varios colores</p>
     @endif
     @if(!empty($tallas))
       <div class="mt-2 flex flex-wrap gap-1.5">

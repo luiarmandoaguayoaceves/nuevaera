@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const title = document.getElementById('qvTitle');
   const wapp  = document.getElementById('qvWapp');
   const close = document.getElementById('qvClose');
+  const closeBtn = document.getElementById('qvCloseBtn');
   const prev  = document.getElementById('qvPrev');
   const next  = document.getElementById('qvNext');
 
@@ -39,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       try { imgs = JSON.parse(el.dataset.images || '[]'); } catch { imgs = []; }
       if (imgs.length === 0) imgs = [el.dataset.img || ''];
+      const showNav = imgs.length > 1;
+      prev?.classList.toggle('hidden', !showNav);
+      next?.classList.toggle('hidden', !showNav);
       idx = 0;
       modelo = el.dataset.model || '';
       phone  = el.dataset.whats || '';
@@ -59,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   close?.addEventListener('click', () => setVisible(false));
+  closeBtn?.addEventListener('click', () => setVisible(false));
   modal?.addEventListener('click', (e) => { if (e.target === modal) setVisible(false); });
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') setVisible(false);
