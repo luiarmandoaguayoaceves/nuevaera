@@ -14,7 +14,7 @@
       <a id="qvWapp" target="_blank" class="mt-4 block rounded-lg bg-green-500 px-4 py-2 text-center text-white font-semibold hover:bg-green-600">
         Pedir por WhatsApp
       </a>
-      <button id="qvCloseBtn" class="mt-2 w-full rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cerrar</button>
+      {{-- <button id="qvCloseBtn" class="mt-2 w-full rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cerrar</button> --}}
     </div>
   </div>
 </div>
