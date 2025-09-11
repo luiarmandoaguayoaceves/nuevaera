@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const lbTitle  = document.getElementById('lbTitle');
   const lbWapp   = document.getElementById('lbWapp');
   const lbClose  = document.getElementById('lbClose');
+  const lbCloseBtn = document.getElementById('lbCloseBtn');
   const lbPrev   = document.getElementById('lbPrev');
   const lbNext   = document.getElementById('lbNext');
   const storePhone = lb?.dataset?.whats || '';
@@ -83,7 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  const open = (group, i) => { gKey = group; idx = i; loadCurrent(); setVisible(true); };
+  const open = (group, i) => {
+    gKey = group; idx = i;
+    const arr = map[gKey] || [];
+    const showNav = arr.length > 1;
+    lbPrev?.classList.toggle('hidden', !showNav);
+    lbNext?.classList.toggle('hidden', !showNav);
+    loadCurrent();
+    setVisible(true);
+  };
   const move = (delta) => { const arr = map[gKey]; if (!arr) return; idx = (idx + delta + arr.length) % arr.length; loadCurrent(); };
 
   items.forEach(el => el.addEventListener('click', () => {
@@ -92,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }));
 
   lbClose?.addEventListener('click', () => setVisible(false));
+  lbCloseBtn?.addEventListener('click', () => setVisible(false));
   lbPrev?.addEventListener('click', () => move(-1));
   lbNext?.addEventListener('click', () => move(1));
   lb?.addEventListener('click', (e) => { if (e.target === lb) setVisible(false); });
