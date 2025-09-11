@@ -3,12 +3,13 @@
 ])
 
 @php
-  $img   = $product->imagen_principal ?? asset('img/placeholder.webp');
+  $img    = $product->imagen_principal ?? asset('img/placeholder.webp');
   $precio = $product->precio;
   $badge  = $product->badge;
   $modelo = $product->modelo;
   $catStr = $product->category->slug ?? $product->category->nombre ?? ($product->categoria ?? '');
   $tallas = is_array($product->tallas ?? null) ? $product->tallas : [];
+  $imgs   = $product->images->pluck('url');
 @endphp
 
 <li
@@ -17,6 +18,7 @@
      class="block js-quick"
      data-model="{{ $modelo }}"
      data-img="{{ $img }}"
+     data-images='@json($imgs)'
      data-precio="{{ $precio ?? 0 }}"
      data-whats="{{ config('services.whatsapp_sales') }}">
     <div class="relative aspect-[3/4] w-full overflow-hidden bg-gray-100">
