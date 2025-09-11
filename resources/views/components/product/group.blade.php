@@ -17,7 +17,7 @@
   <header class="mb-5 flex items-center gap-4">
     <div class="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border">
       @if($principal)
-        <img src="{{ $principal->url }}" alt="{{ $principal->alt ?? $p->nombre }}" class="w-full h-full object-cover" loading="lazy">
+        <img src="{{ $principal->url }}" alt="{{ $principal->alt ?? $p->nombre }}" class="w-full h-full object-contain" loading="lazy">
       @else
         <div class="w-full h-full grid place-items-center text-xs text-gray-500">No img</div>
       @endif
@@ -61,7 +61,7 @@
             <img src="{{ $img->url }}"
                  alt="{{ $img->alt ?? $p->nombre }}"
                  loading="lazy"
-                 class="w-full h-48 object-cover transition group-hover:scale-[1.02]">
+                 class="w-full h-48 object-contain transition group-hover:scale-[1.02]">
             {{-- Overlay sutil --}}
             <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
             {{-- Marca principal --}}
