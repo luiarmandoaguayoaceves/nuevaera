@@ -2,6 +2,18 @@
 @extends('layouts.app')
 
 @section('content')
+  <!-- Cabecera del Admin con Botón de Logout -->
+  <header class="flex flex-col md:flex-row items-center justify-between bg-white px-6 py-4 shadow-sm mb-8 rounded-xl border border-gray-100">
+    <h1 class="text-xl font-bold text-gray-800 mb-4 md:mb-0">Panel de Administración - Galería</h1>
+    
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-red-600 transition-colors">
+            Cerrar Sesión
+        </button>
+    </form>
+  </header>
+
   {{-- ALERTAS --}}
   @if (session('ok'))
     <div class="mb-4 rounded-xl bg-green-50 border border-green-200 text-green-800 px-4 py-3">
@@ -21,74 +33,151 @@
   @endif
 
   {{-- NUEVO PRODUCTO --}}
-  <div class="form-card mb-8">
-    <h2 class="text-lg font-semibold mb-4">Nuevo producto</h2>
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mb-10 overflow-hidden">
+    <div class="bg-slate-50/50 border-b border-slate-200 px-6 py-5">
+        <h2 class="text-lg font-bold text-slate-800">Agregar Nuevo Producto</h2>
+        <p class="text-sm text-slate-500 mt-1">Completa los detalles a continuación para añadir un nuevo calzado al catálogo.</p>
+    </div>
 
-    <form method="POST" action="{{ route('admin.galeria.producto.store') }}" enctype="multipart/form-data"
-          class="grid md:grid-cols-3 gap-4">
-      @csrf
+    <form action="{{ route('admin.galeria.producto.store') }}" method="POST" enctype="multipart/form-data" class="p-6">
+        @csrf
+        
+        <div class="space-y-8">
+            <!-- Sección 1: Información Básica -->
+            <div>
+                <h3 class="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2 uppercase tracking-wider">
+                    <span class="w-8 h-[1px] bg-slate-200"></span>
+                    1. Información General
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="nombre" class="block text-sm font-medium text-slate-700 mb-1">Nombre del producto <span class="text-red-500">*</span></label>
+                        <input type="text" name="nombre" id="nombre" value="{{ old('nombre') }}" required 
+                               class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-rose-500 focus:ring-rose-500 transition-colors sm:text-sm" placeholder="Ej. Tacón elegante negro">
+                        @error('nombre') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                    
+                    <div>
+                        <label for="modelo" class="block text-sm font-medium text-slate-700 mb-1">Modelo / SKU <span class="text-red-500">*</span></label>
+                        <input type="text" name="modelo" id="modelo" value="{{ old('modelo', $siguienteModelo ?? '') }}" required 
+                               class="block w-full rounded-lg border-slate-300 bg-slate-50 shadow-sm focus:border-rose-500 focus:ring-rose-500 transition-colors sm:text-sm font-medium text-slate-900">
+                        @error('modelo') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
 
-      <div class="form-section">
-        <p class="form-title">Identificación</p>
-        <label class="label">Modelo</label>
-        <input name="modelo" value="{{ old('modelo', $siguienteModelo) }}" required class="input" />
-        <p class="hint">Numeración o clave interna.</p>
-      </div>
+                    <div>
+                        <label for="badge" class="block text-sm font-medium text-slate-700 mb-1">Etiqueta promocional</label>
+                        <input type="text" name="badge" id="badge" value="{{ old('badge') }}" placeholder="Ej. Nuevo, Oferta..."
+                               class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-rose-500 focus:ring-rose-500 transition-colors sm:text-sm">
+                        @error('badge') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
 
-      <div class="md:col-span-2 form-section">
-        <p class="form-title">Nombre y descripción</p>
-        <label class="label">Nombre</label>
-        <input name="nombre" value="{{ old('nombre') }}" required class="input" />
-        <label class="label mt-4">Descripción</label>
-        <textarea name="descripcion" rows="2" class="textarea">{{ old('descripcion') }}</textarea>
-      </div>
+                    <div class="md:col-span-2">
+                        <label for="descripcion" class="block text-sm font-medium text-slate-700 mb-1">Descripción corta</label>
+                        <textarea name="descripcion" id="descripcion" rows="2" 
+                                  class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-rose-500 focus:ring-rose-500 transition-colors sm:text-sm"
+                                  placeholder="Describe las características principales del calzado...">{{ old('descripcion') }}</textarea>
+                        @error('descripcion') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+            </div>
 
-      <div class="form-section">
-        <p class="form-title">Precio</p>
-        <label class="label">Precio</label>
-        <input type="number" step="0.01" min="0" name="precio" value="{{ old('precio', 0) }}" class="input" />
-      </div>
+            <!-- Sección 2: Organización y Precios -->
+            <div>
+                <h3 class="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2 uppercase tracking-wider">
+                    <span class="w-8 h-[1px] bg-slate-200"></span>
+                    2. Detalles de Venta
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="precio" class="block text-sm font-medium text-slate-700 mb-1">Precio ($)</label>
+                        <div class="relative rounded-lg shadow-sm">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <span class="text-slate-500 sm:text-sm font-medium">$</span>
+                            </div>
+                            <input type="number" step="0.01" min="0" name="precio" id="precio" value="{{ old('precio', 0) }}" placeholder="0.00"
+                                   class="block w-full rounded-lg border-slate-300 pl-8 shadow-sm focus:border-rose-500 focus:ring-rose-500 transition-colors sm:text-sm">
+                        </div>
+                        @error('precio') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
 
-      <div class="form-section">
-        <p class="form-title">Tallas</p>
-        <label class="label">Tallas (separadas por coma)</label>
-        <input name="tallas" value="{{ old('tallas', '22,23,24') }}" class="input" />
-      </div>
+                    <div>
+                        <label for="category_id" class="block text-sm font-medium text-slate-700 mb-1">Categoría <span class="text-red-500">*</span></label>
+                        <select name="category_id" id="category_id" required 
+                                class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-rose-500 focus:ring-rose-500 transition-colors sm:text-sm bg-white">
+                            <option value="" disabled selected>-- Seleccionar --</option>
+                            @foreach($categorias as $c)
+                                <option value="{{ $c->id }}" @selected(old('category_id') == $c->id)>
+                                    {{ $c->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('category_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
 
-      <div class="form-section">
-        <p class="form-title">Etiqueta</p>
-        <label class="label">Badge</label>
-        <input name="badge" value="{{ old('badge') }}" class="input" placeholder="Nuevo, Oferta..." />
-      </div>
+                    <div>
+                        <label for="tallas" class="block text-sm font-medium text-slate-700 mb-1">Tallas</label>
+                        <input type="text" name="tallas" id="tallas" value="{{ old('tallas', '22,23,24') }}" placeholder="22, 23, 24..."
+                               class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-rose-500 focus:ring-rose-500 transition-colors sm:text-sm">
+                        <p class="text-xs text-slate-500 mt-1.5">Separadas por comas (,)</p>
+                        @error('tallas') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+            </div>
 
-      <div class="form-section">
-        <p class="form-title">Clasificación</p>
-        <label class="label">Categoría</label>
-        <select name="category_id" class="select" required>
-          <option value="">— Selecciona —</option>
-          @foreach ($categorias as $c)
-            <option value="{{ $c->id }}" @selected(old('category_id') == $c->id)>{{ $c->nombre }}</option>
-          @endforeach
-        </select>
+            <!-- Sección 3: Multimedia y Estado -->
+            <div>
+                <h3 class="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2 uppercase tracking-wider">
+                    <span class="w-8 h-[1px] bg-slate-200"></span>
+                    3. Multimedia y Estado
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Área de Drag & Drop -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Imágenes de la galería</label>
+                        <div class="mt-1 flex justify-center rounded-xl border border-dashed border-slate-300 px-6 py-8 hover:bg-slate-50 hover:border-slate-400 transition-all relative group">
+                            <div class="text-center">
+                                <svg class="mx-auto h-10 w-10 text-slate-300 group-hover:text-rose-400 transition-colors" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+                                </svg>
+                                <div class="mt-4 flex text-sm leading-6 text-slate-600 justify-center">
+                                    <label for="files" class="relative cursor-pointer rounded-md font-semibold text-rose-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-rose-600 focus-within:ring-offset-2 hover:text-rose-500">
+                                        <span>Sube archivos</span>
+                                        <input id="files" name="files[]" type="file" multiple accept="image/*" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">o arrastra y suelta aquí</p>
+                                </div>
+                                <p class="text-xs leading-5 text-slate-400 mt-1">PNG, JPG, WEBP hasta 5MB</p>
+                            </div>
+                        </div>
+                        @error('files.*') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
 
-        <label class="label mt-4">Activo</label>
-        <select name="activo" class="select">
-          <option value="1" selected>Sí</option>
-          <option value="0">No</option>
-        </select>
-      </div>
+                    <div>
+                        <label for="activo" class="block text-sm font-medium text-slate-700 mb-1">Estado en tienda <span class="text-red-500">*</span></label>
+                        <div class="rounded-xl border border-slate-200 p-4 bg-slate-50/50">
+                            <select name="activo" id="activo" required 
+                                    class="block w-full rounded-lg border-slate-300 bg-white shadow-sm focus:border-rose-500 focus:ring-rose-500 transition-colors sm:text-sm mb-3 font-medium text-slate-700">
+                                <option value="1" {{ old('activo', '1') == '1' ? 'selected' : '' }}>🟢 Publicado (Visible en tienda)</option>
+                                <option value="0" {{ old('activo') == '0' ? 'selected' : '' }}>🔴 Oculto (Borrador)</option>
+                            </select>
+                            <p class="text-xs text-slate-500 leading-relaxed">Los productos ocultos no aparecerán en el catálogo público pero pueden ser editados en el panel en cualquier momento.</p>
+                        </div>
+                        @error('activo') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+            </div>
+        </div>
 
-      <div class="md:col-span-2 form-section">
-        <p class="form-title">Imágenes</p>
-        <label class="label">Imágenes (opcional)</label>
-        <input type="file" name="files[]" multiple accept="image/*"
-               class="input file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-200 file:text-slate-800 hover:file:bg-slate-300">
-        <p class="hint">JPG/PNG/WEBP/AVIF · máx 5 MB c/u</p>
-      </div>
-
-      <div class="md:col-span-3">
-        <button class="btn-primary">Crear producto</button>
-      </div>
+        <!-- Botones de Acción -->
+        <div class="mt-10 flex items-center justify-end gap-x-4 border-t border-slate-200 pt-6">
+            <button type="reset" class="text-sm font-semibold leading-6 text-slate-500 hover:text-slate-800 transition-colors">
+                Limpiar formulario
+            </button>
+            <button type="submit" class="rounded-lg bg-rose-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-rose-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Guardar Producto
+            </button>
+        </div>
     </form>
   </div>
 
