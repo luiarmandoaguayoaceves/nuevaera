@@ -89,7 +89,7 @@ class GalleryController extends Controller
 
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'path'       => 'galeria/' . $nombreImagen, // Guardamos la ruta relativa
+                    'path'       => 'storage/' . $nombreImagen, // Guardamos la ruta relativa
                     'alt'        => $product->nombre,
                     'is_primary' => $i === 0,
                     'orden'      => $i + 1,
