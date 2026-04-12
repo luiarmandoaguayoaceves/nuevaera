@@ -159,7 +159,7 @@ class ProductSeeder extends Seeder
 
                 ProductImage::create([
                     'product_id' => $producto->id,
-                    'path'       => $path,                           // ej. 'img/galeria/1.jpeg'
+                    'path'       => str_replace('img/', '', $path),  // quitamos img/ para evitar /img/img/galeria/...
                     'alt'        => $producto->nombre.' '.($i + 1), // opcional
                     'is_primary' => $i === 0,
                     'orden'      => $i + 1,

@@ -36,6 +36,13 @@
             </div>
         @endif
 
+        @if (session('error'))
+            <div class="mb-6 flex items-center p-4 bg-red-50 border-l-4 border-red-500 text-red-800 rounded-r-xl shadow-sm">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="font-medium">{{ session('error') }}</span>
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {{-- Columna Izquierda: Formulario de Registro --}}
             <div class="lg:col-span-1">
@@ -48,32 +55,44 @@
                     <form action="{{ route('admin.galeria.producto.store') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-5">
                         @csrf
                         
+                        <input type="hidden" name="activo" value="1">
+                        
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre</label>
-                            <input type="text" name="nombre" required class="w-full rounded-xl border-slate-200 focus:ring-rose-500 focus:border-rose-500 transition-all text-sm" placeholder="Nombre del zapato">
+                            <input type="text" name="nombre" value="{{ old('nombre') }}" required class="w-full rounded-xl border-slate-200 focus:ring-rose-500 focus:border-rose-500 transition-all text-sm @error('nombre') border-red-500 @enderror" placeholder="Nombre del zapato">
+                            @error('nombre') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Modelo/SKU</label>
-                                <input type="text" name="modelo" value="{{ $siguienteModelo }}" class="w-full rounded-xl border-slate-200 bg-slate-50 text-sm font-mono">
+                                <input type="text" name="modelo" value="{{ old('modelo', $siguienteModelo) }}" class="w-full rounded-xl border-slate-200 bg-slate-50 text-sm font-mono @error('modelo') border-red-500 @enderror">
+                                @error('modelo') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Precio</label>
                                 <div class="relative">
                                     <span class="absolute left-3 top-2 text-slate-400 text-sm">$</span>
-                                    <input type="number" name="precio" step="0.01" class="w-full pl-7 rounded-xl border-slate-200 text-sm" placeholder="0.00">
+                                    <input type="number" name="precio" value="{{ old('precio') }}" step="0.01" class="w-full pl-7 rounded-xl border-slate-200 text-sm @error('precio') border-red-500 @enderror" placeholder="0.00">
                                 </div>
+                                @error('precio') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Categoría</label>
-                            <select name="category_id" class="w-full rounded-xl border-slate-200 text-sm">
+                            <select name="category_id" class="w-full rounded-xl border-slate-200 text-sm @error('category_id') border-red-500 @enderror">
                                 @foreach($categorias as $c)
-                                    <option value="{{ $c->id }}">{{ $c->nombre }}</option>
+                                    <option value="{{ $c->id }}" {{ old('category_id') == $c->id ? 'selected' : '' }}>{{ $c->nombre }}</option>
                                 @endforeach
                             </select>
+                            @error('category_id') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Tallas (Separadas por coma)</label>
+                            <input type="text" name="tallas" value="{{ old('tallas') }}" class="w-full rounded-xl border-slate-200 text-sm @error('tallas') border-red-500 @enderror" placeholder="Ej: 22,23,24">
+                            @error('tallas') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
@@ -81,10 +100,12 @@
                             <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl hover:border-rose-400 transition-colors cursor-pointer group relative">
                                 <div class="space-y-1 text-center">
                                     <svg class="mx-auto h-10 w-10 text-slate-400 group-hover:text-rose-500" stroke="currentColor" fill="none" viewBox="0 0 48 48"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                                    <p class="text-xs text-slate-600">Click para subir</p>
-                                    <input type="file" name="files[]" multiple class="absolute inset-0 opacity-0 cursor-pointer">
+                                    <p id="file-text" class="text-xs text-slate-600 font-medium">Click para subir</p>
+                                    <input type="file" name="files[]" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="document.getElementById('file-text').innerText = this.files.length > 0 ? this.files.length + ' imagen(es) seleccionada(s)' : 'Click para subir'">
                                 </div>
                             </div>
+                            @error('files') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                            @error('files.*') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-rose-200 transition-all flex items-center justify-center gap-2">

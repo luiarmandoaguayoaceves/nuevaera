@@ -61,8 +61,9 @@ class GalleryController extends Controller
             'precio'      => ['nullable', 'numeric', 'min:0'],
             'tallas'      => ['nullable', 'string'],
             'badge'       => ['nullable', 'string', 'max:50'],
-            'category_id' => ['nullable', 'exists:categories,id'],
-            'activo'      => ['required', 'in:0,1'],
+            'category_id' => ['required', 'exists:categories,id'],
+            'activo'      => ['nullable', 'boolean'],
+            'files'       => ['nullable', 'array'],
             'files.*'     => ['nullable', 'image', 'max:5120'],
         ]);
 
@@ -75,12 +76,12 @@ class GalleryController extends Controller
 
         $data = $validator->validated();
         $data['tallas'] = $this->parseTallas($data['tallas'] ?? '');
-        $data['activo'] = (bool) $data['activo'];
+        $data['activo'] = isset($data['activo']) ? (bool) $data['activo'] : true;
 
         $product = Product::create($data);
 
         if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
+            foreach ($request->file('files') as $i => $file) {
                 // Generamos un nombre único
                 $nombreImagen = time() . '_' . $file->getClientOriginalName();
 
@@ -89,7 +90,7 @@ class GalleryController extends Controller
 
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'path'       => 'storage/' . $nombreImagen, // Guardamos la ruta relativa
+                    'path'       => 'galeria/' . $nombreImagen, // Se ajusta al getUrlAttribute del modelo
                     'alt'        => $product->nombre,
                     'is_primary' => $i === 0,
                     'orden'      => $i + 1,
@@ -110,15 +111,33 @@ class GalleryController extends Controller
             'tallas'      => ['nullable', 'string'], // "22,23,24"
             'badge'       => ['nullable', 'string', 'max:50'],
             'category_id' => ['required', 'exists:categories,id'], // <- requerido
-            'activo'      => ['required', 'in:0,1'],
+            'activo'      => ['nullable', 'boolean'],
+            'files'       => ['nullable', 'array'],
             'files.*'     => ['nullable', 'image', 'max:5120'],
         ]);
 
 
         $data['tallas'] = $this->parseTallas($data['tallas'] ?? '');
-        $data['activo'] = (bool) $data['activo'];
+        $data['activo'] = isset($data['activo']) ? (bool) $data['activo'] : true;
 
         $product->update($data);
+
+        // Permitir subir imágenes durante la actualización del producto
+        if ($request->hasFile('files')) {
+            $ordenBase = (int) ($product->images()->max('orden') ?? 0);
+            foreach ($request->file('files') as $i => $file) {
+                $nombreImagen = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('img/galeria'), $nombreImagen);
+
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'path'       => 'galeria/' . $nombreImagen,
+                    'alt'        => $product->nombre,
+                    'is_primary' => $product->images()->count() === 0 && $i === 0,
+                    'orden'      => $ordenBase + $i + 1,
+                ]);
+            }
+        }
 
         return back()->with('ok', 'Producto actualizado');
     }
@@ -135,8 +154,8 @@ class GalleryController extends Controller
     {
         // borra archivos físicos
         foreach ($product->images as $img) {
-            if ($img->path && Storage::disk('public')->exists($img->path)) {
-                Storage::disk('public')->delete($img->path);
+            if ($img->path && !filter_var($img->path, FILTER_VALIDATE_URL) && file_exists(public_path('img/' . $img->path))) {
+                @unlink(public_path('img/' . $img->path));
             }
         }
         $product->delete();
@@ -154,10 +173,11 @@ class GalleryController extends Controller
         $ordenBase = (int) ($product->images()->max('orden') ?? 0);
         $i = 0;
         foreach ($request->file('files') as $file) {
-            $path = $file->store('galeria', 'public');
+            $nombreImagen = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('img/galeria'), $nombreImagen);
             ProductImage::create([
                 'product_id' => $product->id,
-                'path'       => $path,
+                'path'       => 'galeria/' . $nombreImagen,
                 'alt'        => $product->nombre,
                 'is_primary' => $product->images()->count() === 0 && $i === 0,
                 'orden'      => $ordenBase + $i + 1,
@@ -207,8 +227,8 @@ class GalleryController extends Controller
     public function destroyImage(ProductImage $image)
     {
         $pid = $image->product_id;
-        if ($image->path && Storage::disk('public')->exists($image->path)) {
-            Storage::disk('public')->delete($image->path);
+        if ($image->path && !filter_var($image->path, FILTER_VALIDATE_URL) && file_exists(public_path('img/' . $image->path))) {
+            @unlink(public_path('img/' . $image->path));
         }
         $wasPrimary = $image->is_primary;
         $image->delete();
@@ -241,11 +261,14 @@ class GalleryController extends Controller
         ]);
 
         // Subir nueva
-        $newPath = $request->file('file')->store('galeria', 'public');
+        $file = $request->file('file');
+        $nombreImagen = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('img/galeria'), $nombreImagen);
+        $newPath = 'galeria/' . $nombreImagen;
 
-        // Borrar antigua si está en el disk public (no borra URLs externas)
-        if ($image->path && Storage::disk('public')->exists($image->path)) {
-            Storage::disk('public')->delete($image->path);
+        // Borrar antigua físicamente (evitando urls de internet)
+        if ($image->path && !filter_var($image->path, FILTER_VALIDATE_URL) && file_exists(public_path('img/' . $image->path))) {
+            @unlink(public_path('img/' . $image->path));
         }
 
         // Actualizar registro
