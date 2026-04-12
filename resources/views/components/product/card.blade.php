@@ -6,7 +6,7 @@
 
     if ($primaryImage) {
         // Como ahora todo está en public/img, solo concatenamos asset('img/...')
-        $img = asset('/' . $primaryImage->path);
+        $img = asset('storage/' . $primaryImage->path);
     } else {
         $img = asset('img/placeholder.webp');
     }
