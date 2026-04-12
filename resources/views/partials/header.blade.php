@@ -1,21 +1,20 @@
-<header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b">
-  <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-    <a href="{{ route('gallery.index') }}" class="flex items-center gap-3">
-      <img src="{{ asset('img/logo.png') }}" alt="Nueva Era" class="w-10 h-10 rounded-lg shadow-sm">
-      <span class="font-extrabold tracking-tight">Nueva Era</span>
-    </a>
-    <nav class="hidden md:flex items-center gap-6 text-sm">
-      <a href="{{ route('gallery.index') }}#inicio" class="hover:text-rose-500">Inicio</a>
-      <a href="{{ route('gallery.index') }}#galeria" class="hover:text-rose-500">Galería</a>
-      <a href="{{ route('gallery.index') }}#nosotros" class="hover:text-rose-500">Nosotros</a>
-      <a href="{{ route('gallery.index') }}#contacto" class="hover:text-rose-500">Contacto</a>
-      @php $wa = config('services.whatsapp_sales'); @endphp
-      @if($wa)
-        <a href="https://wa.me/{{ $wa }}?text={{ urlencode('Hola, me interesa su catálogo') }}"
-           target="_blank" class="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2 text-white hover:bg-gray-900">
-          WhatsApp
-        </a>
-      @endif
-    </nav>
-  </div>
+<header class="bg-slate-900 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center">
+                <a href="/" class="text-2xl font-bold tracking-tighter">
+                    NUEVA<span class="text-rose-500">ERA</span>
+                </a>
+            </div>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium">
+                <a href="/" class="hover:text-rose-400 transition-colors">Inicio</a>
+                <a href="#" class="hover:text-rose-400 transition-colors">Catálogo</a>
+                @auth
+                    <a href="{{ route('admin.galeria.index') }}" class="text-rose-500 font-bold">Panel Admin</a>
+                @else
+                    <a href="{{ route('login') }}" class="hover:text-rose-400 transition-colors">Ingresar</a>
+                @endauth
+            </nav>
+        </div>
+    </div>
 </header>

@@ -25,22 +25,22 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // URL pública (requiere php artisan storage:link)
+    // app/Models/ProductImage.php
+
     public function getUrlAttribute()
     {
-        $p = ltrim($this->path, '/');
-
-        // URL completa
-        if (Str::startsWith($p, ['http://', 'https://'])) return $this->path;
-
-        // Rutas dentro de /public
-        if (Str::startsWith($p, ['img/', 'public/img/'])) {
-            $p = Str::after($p, 'public/'); // limpia 'public/' si viniera
-            return asset($p);               // => /img/galeria/...
+        // Si el path ya es una URL completa (http...), la regresamos tal cual
+        if (filter_var($this->path, FILTER_VALIDATE_URL)) {
+            return $this->path;
         }
 
-        // Default: disk 'public' (storage:link)
-        return Storage::url($p);            // => /storage/...
+        // Si el path contiene 'galeria/', significa que se subió por el administrador al storage
+        if (str_contains($this->path, 'galeria/')) {
+            return asset('storage/' . $this->path);
+        }
+
+        // De lo contrario, asumimos que es una imagen local en la carpeta public/img/
+        return asset('img/' . $this->path);
     }
 
     public function scopeOrdered($q)

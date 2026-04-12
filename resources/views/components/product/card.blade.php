@@ -1,64 +1,67 @@
-@props([
-  'product', // App\Models\Product con ->imagen_principal, ->images, ->category
-])
+{{-- resources/views/components/product/card.blade.php --}}
+@props(['product'])
 
 @php
-  $img    = $product->imagen_principal ?? asset('img/placeholder.webp');
-  $precio = $product->precio;
-  $badge  = $product->badge;
-  $modelo = $product->modelo;
-  $catStr = $product->category->slug ?? $product->category->nombre ?? ($product->categoria ?? '');
-  $tallas = is_array($product->tallas ?? null) ? $product->tallas : [];
-  $imgs   = $product->images->pluck('url');
-  $hasManyColors = $product->images->count() > 1;
+    $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
+
+    if ($primaryImage) {
+        // Como ahora todo está en public/img, solo concatenamos asset('img/...')
+        $img = asset('/' . $primaryImage->path);
+    } else {
+        $img = asset('img/placeholder.webp');
+    }
 @endphp
 
-<li
-  class="group relative overflow-hidden rounded-2xl bg-white ring-1 ring-gray-200/70 shadow-sm transition hover:shadow-lg hover:-translate-y-0.5">
-  <a href="#"
-     class="block js-quick"
-     data-model="{{ $modelo }}"
-     data-img="{{ $img }}"
-     data-images='@json($imgs)'
-     data-precio="{{ $precio ?? 0 }}"
-     data-whats="{{ config('services.whatsapp_sales') }}">
-    <div class="relative aspect-[3/4] w-full overflow-hidden bg-gray-100">
-      <div class="absolute inset-0 animate-pulse bg-gray-200"></div>
-      <img src="{{ $img }}" alt="Modelo {{ $modelo }} - Calzado"
-           loading="lazy" decoding="async"
-           class="h-full w-full object-contain transition duration-500 group-hover:scale-105"
-           onload="this.previousElementSibling?.remove()">
-      @if($badge)
-        <span class="absolute left-3 top-3 rounded-full bg-black/80 px-3 py-1 text-xs font-semibold text-white shadow">
-          {{ $badge }}
-        </span>
-      @endif
-      <button type="button"
-        class="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-xl bg-white/90 px-3 py-1.5 text-sm font-semibold text-gray-900 shadow opacity-0 backdrop-blur transition group-hover:opacity-100 hover:bg-white">
-        Vista rápida
-      </button>
-    </div>
-  </a>
 
-  <div class="space-y-1 p-4">
-    <div class="flex items-start justify-between gap-3">
-      <h3 class="text-sm font-semibold text-gray-900">Modelo {{ $modelo }}</h3>
-      @if(!is_null($precio))
-        {{-- <p class="text-sm font-bold text-gray-900">${{ number_format($precio, 2) }} MXN</p> --}}
-      @endif
+
+<li
+    class="group relative flex flex-col overflow-hidden rounded-3xl bg-white border border-slate-200 shadow-sm transition-all hover:shadow-xl">
+
+    {{-- Contenedor de Imagen --}}
+    <div class="relative aspect-[4/5] w-full overflow-hidden bg-slate-100">
+        {{-- En el src de tu imagen --}}
+        <img src="{{ $img }}" alt="{{ $product->nombre }}" class="...">
+
+        {{-- Badge --}}
+        @if ($product->badge)
+            <span
+                class="absolute left-3 top-3 rounded-xl bg-rose-600 px-3 py-1.5 text-[10px] font-bold uppercase text-white shadow-lg">
+                {{ $product->badge }}
+            </span>
+        @endif
+
+        {{-- BOTÓN DE VISTA RÁPIDA (Ahora más visible) --}}
+        <div
+            class="absolute inset-x-0 bottom-0 p-4 translate-y-full transition-transform duration-300 group-hover:translate-y-0 bg-gradient-to-t from-black/60 to-transparent">
+            <button onclick='openQuickView(@json($product->load('category', 'images')))'
+                class="w-full rounded-xl bg-white py-2.5 text-xs font-bold text-slate-900 shadow-lg hover:bg-rose-600 hover:text-white transition-colors">
+                VISTA RÁPIDA
+            </button>
+        </div>
     </div>
-    @if($catStr)
-      <p class="text-xs text-gray-500 capitalize">{{ $catStr }}</p>
-    @endif
-    @if($hasManyColors)
-      <p class="text-xs text-rose-500">Disponible en varios colores</p>
-    @endif
-    @if(!empty($tallas))
-      <div class="mt-2 flex flex-wrap gap-1.5">
-        @foreach($tallas as $t)
-          <span class="rounded-md border border-gray-200 px-2 py-0.5 text-[11px] text-gray-700">T{{ $t }}</span>
-        @endforeach
-      </div>
-    @endif
-  </div>
+
+    {{-- Info --}}
+    <div class="p-4 flex flex-col flex-1">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-rose-500 mb-1">
+            {{ $product->category->nombre ?? 'Calzado' }}
+        </span>
+        <h3 class="text-base font-bold text-slate-900 mb-1">{{ $product->nombre }}</h3>
+
+        <div class="flex items-center justify-between mt-auto pt-2">
+            <p class="text-xs text-slate-500">Mod: <span class="font-mono text-slate-800">{{ $product->modelo }}</span>
+            </p>
+            <p class="text-lg font-black text-slate-900">${{ number_format($product->precio, 0) }}</p>
+        </div>
+
+        @if (!empty($tallas))
+            <div class="mt-3 flex flex-wrap gap-1">
+                @foreach (array_slice($tallas, 0, 4) as $t)
+                    <span
+                        class="h-6 w-6 flex items-center justify-center rounded-lg border border-slate-200 text-[10px] font-bold text-slate-600 bg-slate-50">
+                        {{ $t }}
+                    </span>
+                @endforeach
+            </div>
+        @endif
+    </div>
 </li>

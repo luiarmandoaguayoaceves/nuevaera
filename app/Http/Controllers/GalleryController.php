@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -79,17 +80,20 @@ class GalleryController extends Controller
         $product = Product::create($data);
 
         if ($request->hasFile('files')) {
-            $i = 0;
             foreach ($request->file('files') as $file) {
-                $path = $file->store('galeria', 'public');
+                // Generamos un nombre único
+                $nombreImagen = time() . '_' . $file->getClientOriginalName();
+
+                // Lo movemos directamente a public/img/galeria
+                $file->move(public_path('img/galeria'), $nombreImagen);
+
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'path'       => $path,
+                    'path'       => 'galeria/' . $nombreImagen, // Guardamos la ruta relativa
                     'alt'        => $product->nombre,
                     'is_primary' => $i === 0,
                     'orden'      => $i + 1,
                 ]);
-                $i++;
             }
         }
 
@@ -251,5 +255,16 @@ class GalleryController extends Controller
         ]);
 
         return back()->with('ok', 'Imagen reemplazada');
+    }
+
+    public function destroy(Request $request)
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Redirección explícita a la raíz
+        return redirect('/');
     }
 }
