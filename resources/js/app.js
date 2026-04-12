@@ -13,7 +13,7 @@ window.openQuickView = function (product) {
         
         // Construimos la URL completa usando la propiedad 'path'
         // Si el path ya trae 'galeria/foto.jpg', esto resultará en /img/galeria/foto.jpg
-        imageUrl = window.location.origin + '/' + primary.path;
+        imageUrl = window.location.origin + 'storage/' + primary.path;
     }
 
     // 2. Asignar imagen al contenedor
