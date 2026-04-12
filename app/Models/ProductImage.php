@@ -29,17 +29,13 @@ class ProductImage extends Model
 
     public function getUrlAttribute()
     {
-        // Si el path ya es una URL completa (http...), la regresamos tal cual
+        // Si la ruta ya es una URL completa de internet, la dejamos pasar
         if (filter_var($this->path, FILTER_VALIDATE_URL)) {
             return $this->path;
         }
 
-        // Si el path contiene 'galeria/', significa que se subió por el administrador al storage
-        if (str_contains($this->path, 'galeria/')) {
-            return asset('storage/' . $this->path);
-        }
-
-        // De lo contrario, asumimos que es una imagen local en la carpeta public/img/
+        // Retornamos la ruta SIEMPRE apuntando a la carpeta /img/ que está en public
+        // Esto arreglará el error de la captura
         return asset('img/' . $this->path);
     }
 
