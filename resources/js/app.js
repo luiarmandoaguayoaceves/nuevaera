@@ -11,10 +11,9 @@ window.openQuickView = function (product) {
         // Buscamos la principal o tomamos la primera
         const primary = product.images.find(i => i.is_primary == 1) || product.images[0];
         
-        // Construimos la URL completa usando la propiedad 'path'
-        // Si el path ya trae 'galeria/foto.jpg', esto resultará en /img/galeria/foto.jpg
-        console.log(primary.path);
-        imageUrl = window.location.origin + '/img/' + primary.path;
+        // Ahora 'primary' tiene acceso directo a 'url' gracias a $appends en el modelo
+        console.log(primary.url);
+        imageUrl = primary.url;
     }
 
     // 2. Asignar imagen al contenedor

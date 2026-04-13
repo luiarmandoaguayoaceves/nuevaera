@@ -20,6 +20,9 @@ class ProductImage extends Model
         'is_primary' => 'boolean',
     ];
 
+    // Le decimos a Laravel que SIEMPRE adjunte el atributo dinámico 'url' al exportar a JSON o Array
+    protected $appends = ['url'];
+
     public function product()
     {
         return $this->belongsTo(Product::class);
