@@ -139,7 +139,7 @@
                         <div class="flex-1">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <span class="text-xs font-bold text-rose-500 uppercase tracking-widest">{{ $p->category->nombre ?? 'Sin categoría' }}</span>
+                                    <span class="text-xs font-bold text-rose-500 uppercase tracking-widest">{{ $p->category?->nombre ?? 'Sin categoría' }}</span>
                                     <h3 class="text-lg font-bold text-slate-800">{{ $p->nombre }}</h3>
                                     <p class="text-sm text-slate-500 font-mono">Mod: {{ $p->modelo }} | ${{ number_format($p->precio, 2) }}</p>
                                 </div>

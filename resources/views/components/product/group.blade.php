@@ -3,7 +3,7 @@
 @php
   $p = $product;
   $principal = $p->images->firstWhere('is_primary', true) ?? $p->images->sortBy('orden')->first();
-  $categoria = $p->category->nombre ?? '';
+  $categoria = $p->category?->nombre ?? '';
   $tallasCsv = implode(',', $p->tallas ?? []);
 @endphp
 
