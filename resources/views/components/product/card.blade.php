@@ -61,7 +61,7 @@
         <div class="flex items-center justify-between mt-auto pt-2">
             <p class="text-xs text-slate-500">Mod: <span class="font-mono text-slate-800">{{ $product->modelo }}</span>
             </p>
-            <p class="text-lg font-black text-slate-900">${{ number_format($product->precio, 0) }}</p>
+            <p class="text-lg font-black text-slate-900">${{ number_format((float)($product->precio ?? 0), 0) }}</p>
         </div>
 
         @if (!empty($tallasList))

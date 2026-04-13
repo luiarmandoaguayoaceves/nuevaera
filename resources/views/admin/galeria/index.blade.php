@@ -141,7 +141,7 @@
                                 <div>
                                     <span class="text-xs font-bold text-rose-500 uppercase tracking-widest">{{ $p->category?->nombre ?? 'Sin categoría' }}</span>
                                     <h3 class="text-lg font-bold text-slate-800">{{ $p->nombre }}</h3>
-                                    <p class="text-sm text-slate-500 font-mono">Mod: {{ $p->modelo }} | ${{ number_format($p->precio, 2) }}</p>
+                                    <p class="text-sm text-slate-500 font-mono">Mod: {{ $p->modelo }} | ${{ number_format((float)($p->precio ?? 0), 2) }}</p>
                                 </div>
                                 <div class="flex gap-2">
                                     <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
