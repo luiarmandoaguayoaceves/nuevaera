@@ -29,7 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const loadCurrent = () => {
-    const current = imgs[idx] || '';
+    let current = imgs[idx] || '';
+    
+    // Reparación de ruta: Agregamos /img/ si la ruta es relativa
+    if (current && !current.startsWith('http') && !current.startsWith('/')) {
+      current = '/img/' + current;
+    }
+
     if (img) { img.src = current; img.alt = `Modelo ${modelo}`; }
     if (title) { title.textContent = `Modelo ${modelo}`; }
     if (wapp) { wapp.href = composeWappLink(phone, modelo, current); }

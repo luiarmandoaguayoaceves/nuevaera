@@ -71,7 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadCurrent = () => {
     const arr = map[gKey]; if (!arr) return;
     const el  = arr[idx];
-    const img = el.dataset.img;
+    
+    let img = el.dataset.img || '';
+    // Reparación de ruta: Agregamos /img/ si la ruta es relativa (ej: galeria/foto.jpg)
+    if (img && !img.startsWith('http') && !img.startsWith('/')) {
+      img = '/img/' + img;
+    }
+
     const title = el.dataset.title || `${el.dataset.modelo} — ${el.dataset.nombre}`;
     if (lbImg) { lbImg.src = img; lbImg.alt = title; }
     if (lbTitle) lbTitle.textContent = title;
@@ -80,7 +86,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // preload vecino
     [idx-1, idx+1].forEach(i => {
       const n = (i + arr.length) % arr.length;
-      const pre = new Image(); pre.src = arr[n].dataset.img;
+      
+      let preloadImg = arr[n].dataset.img || '';
+      if (preloadImg && !preloadImg.startsWith('http') && !preloadImg.startsWith('/')) {
+        preloadImg = '/img/' + preloadImg;
+      }
+      const pre = new Image(); pre.src = preloadImg;
     });
   };
 
